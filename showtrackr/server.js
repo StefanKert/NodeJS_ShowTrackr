@@ -1,3 +1,7 @@
+var csso = require('gulp-csso');
+var uglify = require('gulp-uglify');
+var concat = require('gulp-concat');
+var templateCache = require('gulp-angular-templatecache');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
@@ -12,6 +16,7 @@ var _ = require('lodash');
 var session = require('express-session');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
+var compress = require('compression')
 
 
 var showSchema = new mongoose.Schema({
@@ -72,6 +77,7 @@ mongoose.connect('localhost');
 var app = express();
 
 app.set('port', process.env.PORT || 3000);
+app.use(compress())
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
@@ -80,6 +86,13 @@ app.use(session({ secret: 'keyboard cat' }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(function(req, res, next) {
+  if (req.user) {
+    res.cookie('user', JSON.stringify(req.user));
+  }
+  next();
+});
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 86400000 }));
 
 app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
