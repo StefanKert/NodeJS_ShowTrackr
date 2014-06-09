@@ -12,9 +12,6 @@ var _ = require('lodash');
 var session = require('express-session');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
-var agenda = require('agenda')({ db: { address: 'localhost:27017/test' } });
-var sugar = require('sugar');
-var nodemailer = require('nodemailer');
 
 
 var showSchema = new mongoose.Schema({
@@ -247,7 +244,6 @@ app.get('/api/logout', function(req, res, next) {
   req.logout();
   res.send(200);
 });
-
   
 app.use(function(req, res, next) {
   if (req.user) {
@@ -255,7 +251,6 @@ app.use(function(req, res, next) {
   }
   next();
 });
-
 
 app.post('/api/subscribe', ensureAuthenticated, function(req, res, next) {
   Show.findById(req.body.showId, function(err, show) {
@@ -279,5 +274,3 @@ app.post('/api/unsubscribe', ensureAuthenticated, function(req, res, next) {
     });
   });
 });
-
-
